@@ -2,9 +2,9 @@ var express = require('express');
 
 var app = express.createServer(express.logger());
 
-var welcomeString = fs.readFileSync("index.html",'utf8').toString();
+var welcomeString = fs.readFileSync("index.html",'utf8');
 app.get('/', function(request, response) {
-  response.send('<<<*>>> Welcome To Avair <<<*>>>' + "   " + welcomeString);
+  response.send(welcomeString);
 });
 
 var port = process.env.PORT || 5000;
