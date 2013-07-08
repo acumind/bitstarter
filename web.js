@@ -2,7 +2,7 @@ var express = require('express');
 
 var app = express.createServer(express.logger());
 
-var welcomeString = fs.readFileSync("index.html",'r');
+var welcomeString = fs.readFileSync("index.html").toString();
 app.get('/', function(request, response) {
   response.send('<<<*>>> Welcome To Avair <<<*>>>' + "   " + welcomeString);
 });
