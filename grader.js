@@ -29,6 +29,7 @@ var HTMLFILE_DEFAULT = "index.html";
 var HTMLFILE_DEFAULT_TEMP = "temp.html";
 var CHECKSFILE_DEFAULT = "checks.json";
 var URL_DEFAULT = "http://avair.herokuapp.com";
+var isUrlCheckInProgress = false;
 
 var assertFileExists = function(infile) {
     var instr = infile.toString();
@@ -40,9 +41,15 @@ var assertFileExists = function(infile) {
 };
 
 var assertValidURL = function(url) {
-   
+        isUrlCheckInProgress = true;
+	rest.get(url).on('complete',function(result) {
+		if( result instanceof Error) {
+			console.log("Url: %s is unreachable or incorrect.Exiting.",url);
+			process.exit(1);
+		}		
 
-};
+	 });
+};	
 
 var cheerioHtmlFile = function(htmlfile) {
     return cheerio.load(fs.readFileSync(htmlfile));
@@ -87,7 +94,11 @@ var checkHtmlFromUrl = function(htmlpage, checksfile) {
 
 var checkUrlPage = function(url) {
 	var page;
-	rest.get(url).on('complete', function(req,res) {
+	rest.get(url).on('complete', function(result,res) {
+		if( result instanceof Error) {
+			console.log("Url: %s is unreachable or incorrect.Exiting.",url);
+			process.exit(1);
+		}
 		page = res.rawEncoded.toString();
 		fs.writeFileSync(HTMLFILE_DEFAULT_TEMP,page,'utf8');
 
@@ -114,10 +125,11 @@ if(require.main == module) {
     var checkJson;
     var htmlPage;
     if(program.url) {
-     	console.log("\nURL : " + program.url + "\n"); 
+     	//console.log("\nURL : " + program.url + "\n"); 
      	checkUrlPage(program.url);
     }
     else {
+	//console.log("\nHtml File : " + program.file.toString() + "\n");
       	checkJson = checkHtmlFile(program.file, program.checks);
     	var outJson = JSON.stringify(checkJson, null, 4);
     	console.log(outJson);
